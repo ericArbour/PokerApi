@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Cors;
 using PokerApi.Models;
+using PokerApi.Controllers;
 
 namespace PokerApi
 {
@@ -20,6 +21,8 @@ namespace PokerApi
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            var doStuff = new DoStuff(Configuration);
+            doStuff.AddShowdown();
         }
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
@@ -30,7 +33,7 @@ namespace PokerApi
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy",
-                    builder => builder.WithOrigins("http://localhost:8000")
+                    builder => builder.AllowAnyOrigin()
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     .AllowCredentials());
