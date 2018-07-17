@@ -23,6 +23,8 @@ namespace PokerApi.Models
 
             using (var context = new ShowdownContext(optionsBuilder.Options))
             {
+                var cardValues = new CardValues();
+                var test = cardValues.GetFiveKVal("A");
                 var showdownsController = new ShowdownsController(context);
                 await showdownsController.PostShowdown(showdown);
             }
