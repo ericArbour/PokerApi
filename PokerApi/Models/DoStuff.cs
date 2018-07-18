@@ -24,6 +24,8 @@ namespace PokerApi.Models
 
             using (var context = new ShowdownContext(optionsBuilder.Options))
             {
+                var cardValues = new CardValues();
+                var numberIHope = cardValues.GetFiveKVal("A");
                 var hand1 = new List<string> { "QD", "8H", "TS", "JC", "4D" };
                 var hand2 = new List<string> { "2C", "JD", "6S", "QC", "AS" };
                 var hands = new List<List<string>> { hand1, hand2 };
