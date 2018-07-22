@@ -7,11 +7,13 @@ namespace PokerApi.Models
 {
     public class CompareHands
     {
-        private CardValues CardValues { get; set; }
+        private CardValues _cardValues { get; set; }
+        private HandValues _handValues { get; set; }
 
-        public CompareHands(CardValues cardValues)
+        public CompareHands(CardValues cardValues, HandValues handValues)
         {
-            CardValues = cardValues;
+            _cardValues = cardValues;
+            _handValues = handValues;
         }
 
         public List<HandWithData> AssignValuesAndTypes(List<List<string>> hands)
@@ -22,7 +24,7 @@ namespace PokerApi.Models
 
         private (int, string) GetValuesAndTypes(List<string> hand)
         {
-            var orderedFaces = hand.Select(card => card.Substring(0, 1)).OrderByDescending(face => CardValues.GetCardIndexes(face)).ToList();
+            var orderedFaces = hand.Select(card => card.Substring(0, 1)).OrderByDescending(face => _cardValues.GetCardIndexes(face)).ToList();
             var uniqueFaces = orderedFaces.Distinct().ToList();
 
             (string, int) uniqueFaceToCountTuple(string uniqueFace) =>
@@ -34,9 +36,29 @@ namespace PokerApi.Models
             var setCount = CountMatches(faceCounts, 3);
             var quadCount = CountMatches(faceCounts, 4);
 
-            var isStraight = CheckStraight(uniqueFaces);
+            var straightHighCard = CheckStraight(uniqueFaces);
 
-            return (1, "One Pair");
+            var isFlush = CheckFlush(hand);
+
+            var valueAndType =
+                !String.IsNullOrEmpty(straightHighCard) ?
+                   isFlush ? (_handValues.StraightValue(straightHighCard) + 43725, "Stright Flush")
+                   : (_handValues.StraightValue(straightHighCard), "Straight")
+                :
+                quadCount == 1 ? (_handValues.QuadValue(faceCounts), "Quad") :
+                setCount == 1 && pairCount == 1 ? (_handValues.FullHouseValue(faceCounts), "Full House") :
+                isFlush ? (_handValues.HighCardHandValue(orderedFaces) + 40960, "Flush") :
+                setCount == 1 ? (_handValues.SetValue(faceCounts), "Set") :
+                pairCount == 2 ? (_handValues.TwoPairValue(faceCounts), "Two Pair") :
+                pairCount == 1 ? (_handValues.OnePairValue(faceCounts), "One Pair") :
+                (_handValues.HighCardHandValue(orderedFaces), "High Card");
+
+            return valueAndType;
+        }
+
+        private bool CheckFlush(List<string> cards)
+        {
+            return cards.Select(card => card.Substring(1, 1)).Distinct().ToList().Count == 1;
         }
 
         private string CheckStraight(List<string> faces)
@@ -46,7 +68,7 @@ namespace PokerApi.Models
 
                 var highestCard = faces[0];
                 var lowestCard = faces[4];
-                var isStraightWithAceHighIndexing = (CardValues.GetCardIndexes(highestCard) - CardValues.GetCardIndexes(lowestCard)) == 4;
+                var isStraightWithAceHighIndexing = (_cardValues.GetCardIndexes(highestCard) - _cardValues.GetCardIndexes(lowestCard)) == 4;
 
                 if (isStraightWithAceHighIndexing)
                 {
@@ -57,7 +79,7 @@ namespace PokerApi.Models
                     {
                         var aceLowHand = faces.GetRange(1, 4).ToList();
                         var aceLowHighestCard = aceLowHand[0];
-                        var isStraightWithAceLowIndexing = (CardValues.GetAceLowIndexes(aceLowHighestCard) - CardValues.GetAceLowIndexes("A")) == 4;
+                        var isStraightWithAceLowIndexing = (_cardValues.GetAceLowIndexes(aceLowHighestCard) - _cardValues.GetAceLowIndexes("A")) == 4;
 
                         if (isStraightWithAceLowIndexing)
                         {

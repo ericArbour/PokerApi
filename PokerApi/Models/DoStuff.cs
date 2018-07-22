@@ -24,10 +24,11 @@ namespace PokerApi.Models
 
             using (var context = new ShowdownContext(optionsBuilder.Options))
             {
-                var hand1 = new List<string> { "AD", "2H", "4S", "3C", "5D" };
-                var hand2 = new List<string> { "2C", "2D", "JS", "JC", "AS" };
+                var hand1 = new List<string> { "AD", "AH", "AD", "AD", "3D" };
+                var hand2 = new List<string> { "2C", "3C", "4C", "5C", "7C" };
                 var hands = new List<List<string>> { hand1, hand2 };
-                var compareHands = new CompareHands(new CardValues());
+                var cardValues = new CardValues();
+                var compareHands = new CompareHands(cardValues, new HandValues(cardValues));
                 var test = compareHands.AssignValuesAndTypes(hands);
                 var showdownsController = new ShowdownsController(context);
                 await showdownsController.PostShowdown(showdown);
