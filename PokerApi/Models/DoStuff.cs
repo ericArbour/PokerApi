@@ -28,8 +28,8 @@ namespace PokerApi.Models
                 var hand2 = new List<string> { "2C", "3C", "4C", "5C", "7C" };
                 var hands = new List<List<string>> { hand1, hand2 };
                 var cardValues = new CardValues();
-                var compareHands = new CompareHands(cardValues, new HandValues(cardValues));
-                var test = compareHands.AssignValuesAndTypes(hands);
+                var handData = new HandData(cardValues, new HandValues(cardValues));
+                var test = handData.Calculate(hand1);
                 var showdownsController = new ShowdownsController(context);
                 await showdownsController.PostShowdown(showdown);
             }
