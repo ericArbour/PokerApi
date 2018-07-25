@@ -19,6 +19,8 @@ namespace TestPokerApi
         [ClassData(typeof(FlushHandsData))]
         [ClassData(typeof(FullHouseHandsData))]
         [ClassData(typeof(QuadHandsData))]
+        [ClassData(typeof(StraightFlushHandsData))]
+        [ClassData(typeof(RandomHandsData))]
         public void CompareHandsTest(List<string> hand1, List<string> hand2)
         {
             var cardValues = new CardValues();
@@ -191,6 +193,44 @@ namespace TestPokerApi
             yield return new object[] { new List<string> { "QS", "QC", "QC", "QC", "2C" }, new List<string> { "JH", "JD", "JD", "JD", "AH" } };
             yield return new object[] { new List<string> { "KS", "KC", "KC", "KC", "2C" }, new List<string> { "QH", "QD", "QD", "QD", "AH" } };
             yield return new object[] { new List<string> { "AS", "AC", "AC", "AC", "2C" }, new List<string> { "KH", "KD", "KD", "KD", "QH" } };
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    }
+
+    public class StraightFlushHandsData : IEnumerable<object[]>
+    {
+        public IEnumerator<object[]> GetEnumerator()
+        {
+            yield return new object[] { new List<string> { "AC", "2C", "3C", "4C", "5C" }, new List<string> { "AH", "AD", "AD", "AD", "KH" } };
+            yield return new object[] { new List<string> { "2C", "3C", "4C", "5C", "6C" }, new List<string> { "AD", "2D", "3D", "4D", "5D" } };
+            yield return new object[] { new List<string> { "3C", "4C", "5C", "6C", "7C" }, new List<string> { "2D", "3D", "4D", "5D", "6D" } };
+            yield return new object[] { new List<string> { "4C", "5C", "6C", "7C", "8C" }, new List<string> { "3D", "4D", "5D", "6D", "7D" } };
+            yield return new object[] { new List<string> { "5C", "6C", "7C", "8C", "9C" }, new List<string> { "4D", "5D", "6D", "7D", "8D" } };
+            yield return new object[] { new List<string> { "6C", "7C", "8C", "9C", "TC" }, new List<string> { "5D", "6D", "7D", "8D", "9D" } };
+            yield return new object[] { new List<string> { "7S", "8S", "9S", "TS", "JS" }, new List<string> { "6C", "7C", "8C", "9C", "TC" } };
+            yield return new object[] { new List<string> { "8S", "9S", "TS", "JS", "QS" }, new List<string> { "7H", "8H", "9H", "TH", "JH" } };
+            yield return new object[] { new List<string> { "9H", "TH", "JH", "QH", "KH" }, new List<string> { "8D", "9D", "TD", "JD", "QD" } };
+            yield return new object[] { new List<string> { "TC", "JC", "QC", "KC", "AC" }, new List<string> { "9H", "TH", "JH", "QH", "KH" } };
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    }
+
+    public class RandomHandsData : IEnumerable<object[]>
+    {
+        public IEnumerator<object[]> GetEnumerator()
+        {
+            yield return new object[] { new List<string> { "KS", "2H", "8C", "5S", "AC" }, new List<string> { "AS", "6D", "5D", "KD", "7H" } };
+            yield return new object[] { new List<string> { "QD", "3C", "2S", "5D", "9S" }, new List<string> { "7S", "8C", "QH", "6C", "5H" } };
+            yield return new object[] { new List<string> { "3H", "2C", "9C", "KH", "AD" }, new List<string> { "8D", "7D", "AH", "KC", "6S" } };
+            yield return new object[] { new List<string> { "AC", "KC", "4S", "2S", "8C" }, new List<string> { "KH", "6D", "AD", "7S", "4H" } };
+            yield return new object[] { new List<string> { "3S", "6D", "TS", "8S", "2C" }, new List<string> { "5C", "TC", "8D", "4D", "2H" } };
+            yield return new object[] { new List<string> { "QD", "4C", "JS", "7D", "8C" }, new List<string> { "5S", "QC", "JH", "8S", "6C" } };
+            yield return new object[] { new List<string> { "7S", "JS", "6S", "2C", "TH" }, new List<string> { "4D", "5S", "JD", "6C", "TD" } };
+            yield return new object[] { new List<string> { "AD", "3H", "9H", "8S", "2H" }, new List<string> { "6H", "7H", "3S", "AC", "9D" } };
+            yield return new object[] { new List<string> { "9D", "7S", "6S", "KD", "2C" }, new List<string> { "6C", "KS", "5D", "4D", "9S" } };
+            yield return new object[] { new List<string> { "7H", "9H", "2C", "AC", "KS" }, new List<string> { "4D", "5H", "KC", "9S", "AD" } };
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
