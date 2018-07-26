@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Timers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using PokerApi.Controllers;
@@ -14,25 +15,29 @@ namespace PokerApi.Models
         public DoStuff(IConfiguration configuration)
         {
             Configuration = configuration;
+            Timer timer = new Timer(1000);
+            timer.Elapsed += async (sender, e) => await HandleTimer();
+            timer.Start();
         }
         public async void AddShowdown()
         {
-            var showdown = new Showdown { Deck = "[\"2H\", \"3H\", \"4H\", \"5H\", \"6H\", \"7H\", \"9H\", \"TH\", \"JH\", \"QH\", \"KH\", \"AH\", \"2D\", \"3D\", \"5D\", \"6D\", \"7D\", \"8D\", \"9D\", \"TD\", \"KD\", \"AD\", \"2S\", \"3S\", \"4S\", \"5S\", \"7S\", \"8S\", \"9S\", \"JS\", \"QS\", \"KS\", \"3C\", \"4C\", \"5C\", \"6C\", \"7C\", \"8C\", \"9C\", \"TC\", \"KC\", \"AC\"]", Hand1 = "[\"QD\", \"8H\", \"TS\", \"JC\", \"4D\"]", Hand1Type = "High Card", Hand2 = "[\"2C\", \"JD\", \"6S\", \"QC\", \"AS\"]", Hand2Type = "High Card", Result = "LT" };
-
+            var deck = new List<string> { "2H", "3H", "4H", "5H", "6H", "7H", "8H", "9H", "TH", "JH", "QH", "KH", "AH", "2D", "3D", "4D", "5D", "6D", "7D", "8D", "9D", "TD", "JD", "QD", "KD", "AD", "2S", "3S", "4S", "5S", "6S", "7S", "8S", "9S", "TS", "JS", "QS", "KS", "AS", "2C", "3C", "4C", "5C", "6C", "7C", "8C", "9C", "TC", "JC", "QC", "KC", "AC" };
             var optionsBuilder = new DbContextOptionsBuilder<ShowdownContext>();
             optionsBuilder.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
 
             using (var context = new ShowdownContext(optionsBuilder.Options))
             {
-                var hand1 = new List<string> { "AD", "AH", "AD", "AD", "3D" };
-                var hand2 = new List<string> { "2C", "3C", "4C", "5C", "7C" };
-                var hands = new List<List<string>> { hand1, hand2 };
                 var cardValues = new CardValues();
                 var handData = new HandData(cardValues, new HandValues(cardValues));
-                var test = handData.Calculate(hand1);
+                var showdown = new Game(handData, deck).Play();
                 var showdownsController = new ShowdownsController(context);
                 await showdownsController.PostShowdown(showdown);
             }
+        }
+        private static Task HandleTimer()
+        {
+            Console.WriteLine("\nHandler not implemented...");
+            throw new NotImplementedException();
         }
     }
 }
