@@ -67,7 +67,8 @@ namespace PokerApi.Models
                 if (isStraightWithAceHighIndexing)
                 {
                     return highestCard;
-                } else
+                }
+                else
                 {
                     if (highestCard == "A")
                     {
@@ -78,16 +79,19 @@ namespace PokerApi.Models
                         if (isStraightWithAceLowIndexing)
                         {
                             return "5";
-                        } else
+                        }
+                        else
                         {
                             return null;
                         }
-                    } else
+                    }
+                    else
                     {
                         return null;
                     }
                 }
-            } else
+            }
+            else
             {
                 return null;
             }
@@ -95,7 +99,7 @@ namespace PokerApi.Models
 
         private int CountMatches(List<(string, int)> list, int quantity)
         {
-            return list.Aggregate(0, (total, next) => next.Item2 == quantity ? total + 1 : total); 
+            return list.Aggregate(0, (total, next) => next.Item2 == quantity ? total + 1 : total);
         }
     }
 

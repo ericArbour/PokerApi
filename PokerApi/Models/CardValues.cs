@@ -23,7 +23,8 @@ namespace PokerApi.Models
             if (dict.ContainsKey(face))
             {
                 return (int)dict[face];
-            } else
+            }
+            else
             {
                 return 0;
             }
@@ -55,3 +56,4 @@ namespace PokerApi.Models
         }
     }
 }
+

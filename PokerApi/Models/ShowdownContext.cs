@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace PokerApi.Models
 {
-    public class ShowdownContext : DbContext 
+    public class ShowdownContext : DbContext
     {
         public ShowdownContext(DbContextOptions<ShowdownContext> options) : base(options)
         {
@@ -16,3 +16,4 @@ namespace PokerApi.Models
         public DbSet<Showdown> Showdowns { get; set; }
     }
 }
+

@@ -9,7 +9,7 @@ namespace PokerApi.Models
     {
         private CardValues _cardValues { get; set; }
 
-        public HandValues (CardValues cardValues)
+        public HandValues(CardValues cardValues)
         {
             _cardValues = cardValues;
         }
@@ -21,9 +21,9 @@ namespace PokerApi.Models
 
         public int OnePairValue(List<(string, int)> faceCounts)
         {
-            return faceCounts.Aggregate(0, 
-                (total, next) => 
-                    next.Item2 == 2 ? 
+            return faceCounts.Aggregate(0,
+                (total, next) =>
+                    next.Item2 == 2 ?
                         (_cardValues.GetCardIndexes(next.Item1) * 2210) + 2427 + total
                         : _cardValues.GetFiveKVal(next.Item1) + total
             );
