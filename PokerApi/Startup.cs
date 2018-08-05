@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PokerApi.Models;
+using PokerApi.Hubs;
 using Microsoft.AspNetCore.Http;
 
 namespace PokerApi
@@ -22,8 +23,6 @@ namespace PokerApi
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            var doStuff = new DoStuff(Configuration);
-            doStuff.AddShowdown();
         }
  
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -39,6 +38,7 @@ namespace PokerApi
                     .AllowCredentials());
             });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -55,7 +55,11 @@ namespace PokerApi
 
             app.UseCors("CorsPolicy");
 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<ChatHub>("/chatHub");
+            });
             app.UseMvc();
 
             app.Run(async (context) =>
