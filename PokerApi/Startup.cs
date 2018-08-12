@@ -14,6 +14,7 @@ using Microsoft.Extensions.Options;
 using PokerApi.Models;
 using PokerApi.Hubs;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.SignalR;
 
 namespace PokerApi
 {
@@ -38,6 +39,7 @@ namespace PokerApi
                     .AllowCredentials());
             });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddSingleton<IGameHandler, GameHandler>();
             services.AddSignalR();
         }
 
