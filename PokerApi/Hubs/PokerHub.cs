@@ -8,7 +8,7 @@ using PokerApi.Models;
 
 namespace PokerApi.Hubs
 {
-    public class ChatHub : Hub
+    public class PokerHub : Hub
     {
         //public async Task PlayGame()
         //{
@@ -20,24 +20,32 @@ namespace PokerApi.Hubs
         //}
         private IGameHandler _gameHandler { get; set; }
 
-        public ChatHub(IGameHandler gameHandler)
+        public PokerHub(IGameHandler gameHandler)
         {
             _gameHandler = gameHandler;
         }
 
-        public override Task OnConnectedAsync()
-        {
-            _gameHandler.AddConnectedId(Context.ConnectionId);
-            var playerCount = _gameHandler.GetConnectedIds.Count();
-            Clients.All.SendAsync("PlayerCount", playerCount);
-            return base.OnConnectedAsync();
-        }
+        //public override Task OnConnectedAsync()
+        //{
+        //    var test = Context;
+        //    _gameHandler.AddConnectedId(Context.ConnectionId);
+        //    var playerCount = _gameHandler.GetConnectedIds.Count();
+        //    Clients.All.SendAsync("PlayerCount", playerCount);
+        //    return base.OnConnectedAsync();
+        //}
 
-        public override Task OnDisconnectedAsync(Exception exception)
+        //public override Task OnDisconnectedAsync(Exception exception)
+        //{
+        //    _gameHandler.RemoveConnectedId(Context.ConnectionId);
+        //    Clients.All.SendAsync("PlayerCount", _gameHandler.GetConnectedIds.Count());
+        //    return base.OnDisconnectedAsync(exception);
+        //}
+
+        public async Task CreateGroup(string groupName)
         {
-            _gameHandler.RemoveConnectedId(Context.ConnectionId);
-            Clients.All.SendAsync("PlayerCount", _gameHandler.GetConnectedIds.Count());
-            return base.OnDisconnectedAsync(exception);
+            await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
+            _gameHandler.CreateGroup(Context.ConnectionId, groupName);
+            await Clients.Caller.SendAsync("GroupCreated", _gameHandler.GetGroups());
         }
     }
 }

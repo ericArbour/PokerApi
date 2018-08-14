@@ -60,7 +60,7 @@ namespace PokerApi
             // app.UseHttpsRedirection();
             app.UseSignalR(routes =>
             {
-                routes.MapHub<ChatHub>("/chatHub");
+                routes.MapHub<PokerHub>("/pokerHub");
             });
             app.UseMvc();
 

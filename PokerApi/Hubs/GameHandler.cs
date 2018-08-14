@@ -9,8 +9,8 @@ namespace PokerApi.Models
 {
     public interface IGameHandler
     {
-        HashSet<string> GetConnectedIds { get; }
-        GameState GetState { get;  }
+        void CreateGroup(string tableConnectionId, string groupName);
+        Dictionary<string, Group> GetGroups();
         void AddConnectedId(string connectedId);
         void RemoveConnectedId(string connectedId);
     }
@@ -18,12 +18,25 @@ namespace PokerApi.Models
     public class GameHandler : IGameHandler
     {
         private HashSet<string> _connectedIds = new HashSet<string> { };
+        private Dictionary<string, Group> _groups = new Dictionary<string, Group> { };
         private GameState _state = new GameState { Playing = false };
-        private readonly IHubContext<ChatHub> _hubContext;
+        private readonly IHubContext<PokerHub> _hubContext;
 
-        public GameHandler(IHubContext<ChatHub> hubContext)
+        public GameHandler(IHubContext<PokerHub> hubContext)
         {
             _hubContext = hubContext;
+        }
+
+        public void CreateGroup(string tableConnectionId, string groupName)
+        {
+            var newGroup = new Group { TableId = tableConnectionId, PlayerIds = new List<string> { } };
+            _groups.Add(groupName, newGroup);
+
+        }
+
+        public Dictionary<string, Group> GetGroups()
+        {
+            return _groups;
         }
 
         public HashSet<string> GetConnectedIds
