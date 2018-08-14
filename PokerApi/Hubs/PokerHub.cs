@@ -41,11 +41,18 @@ namespace PokerApi.Hubs
         //    return base.OnDisconnectedAsync(exception);
         //}
 
-        public async Task CreateGroup(string groupName)
+        public async Task CreateTable(string tableName)
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-            _gameHandler.CreateGroup(Context.ConnectionId, groupName);
-            await Clients.Caller.SendAsync("GroupCreated", _gameHandler.GetGroups());
+            await Groups.AddToGroupAsync(Context.ConnectionId, tableName);
+            _gameHandler.CreateTable(Context.ConnectionId, tableName);
+            await Clients.Caller.SendAsync("TableCreated", _gameHandler.GetTable(tableName));
+        }
+
+        public async Task JoinTable(string tableName)
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, tableName);
+            _gameHandler.AddPlayerToTable(Context.ConnectionId, tableName);
+            await Clients.Group(tableName).SendAsync("PlayerCount", _gameHandler.GetTable(tableName));
         }
     }
 }

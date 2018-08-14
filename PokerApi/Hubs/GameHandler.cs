@@ -9,17 +9,16 @@ namespace PokerApi.Models
 {
     public interface IGameHandler
     {
-        void CreateGroup(string tableConnectionId, string groupName);
-        Dictionary<string, Group> GetGroups();
-        void AddConnectedId(string connectedId);
-        void RemoveConnectedId(string connectedId);
+        void CreateTable(string tableConnectionId, string tableName);
+        Dictionary<string, Table> GetTables();
+        Table GetTable(string tableName);
+        void AddPlayerToTable(string playerConnectionId, string tableName);
     }
 
     public class GameHandler : IGameHandler
     {
         private HashSet<string> _connectedIds = new HashSet<string> { };
-        private Dictionary<string, Group> _groups = new Dictionary<string, Group> { };
-        private GameState _state = new GameState { Playing = false };
+        private Dictionary<string, Table> _tables = new Dictionary<string, Table> { };
         private readonly IHubContext<PokerHub> _hubContext;
 
         public GameHandler(IHubContext<PokerHub> hubContext)
@@ -27,51 +26,26 @@ namespace PokerApi.Models
             _hubContext = hubContext;
         }
 
-        public void CreateGroup(string tableConnectionId, string groupName)
+        public void CreateTable(string tableConnectionId, string tableName)
         {
-            var newGroup = new Group { TableId = tableConnectionId, PlayerIds = new List<string> { } };
-            _groups.Add(groupName, newGroup);
+            var newTable = new Table { TableId = tableConnectionId, Players = new List<Player> { } };
+            _tables.Add(tableName, newTable);
 
         }
 
-        public Dictionary<string, Group> GetGroups()
+        public Dictionary<string, Table> GetTables()
         {
-            return _groups;
+            return _tables;
         }
 
-        public HashSet<string> GetConnectedIds
+        public Table GetTable(string tableName)
         {
-            get
-            {
-                return _connectedIds;
-            }
+            return _tables[tableName];
         }
 
-        public void AddConnectedId(string connectedId)
+        public void AddPlayerToTable(string playerConnectionId, string tableName)
         {
-            _connectedIds.Add(connectedId);
-            if (_connectedIds.Count() > 1)
-            {
-                _hubContext.Clients.All.SendAsync("GameReady");
-            }
-        }
-
-        public void RemoveConnectedId(string connectedId)
-        {
-            _connectedIds.Remove(connectedId);
-        }
-
-        public GameState GetState
-        {
-            get
-            {
-                return _state;
-            }
-        }
-
-        public void StartGame()
-        {
-            _state.Playing = true;
+            _tables[tableName].Players.Add(new Player { PlayerId = playerConnectionId });
         }
     }
 }
