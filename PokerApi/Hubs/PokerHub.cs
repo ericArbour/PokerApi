@@ -27,9 +27,6 @@ namespace PokerApi.Hubs
 
         //public override Task OnConnectedAsync()
         //{
-        //    var test = Context;
-        //    _gameHandler.AddConnectedId(Context.ConnectionId);
-        //    var playerCount = _gameHandler.GetConnectedIds.Count();
         //    Clients.All.SendAsync("PlayerCount", playerCount);
         //    return base.OnConnectedAsync();
         //}
@@ -46,6 +43,11 @@ namespace PokerApi.Hubs
             await Groups.AddToGroupAsync(Context.ConnectionId, tableName);
             _gameHandler.CreateTable(Context.ConnectionId, tableName);
             await Clients.Caller.SendAsync("TableCreated", _gameHandler.GetTable(tableName));
+        }
+
+        public async Task GetTables()
+        {
+            await Clients.Caller.SendAsync("ViewTables", _gameHandler.GetTables());
         }
 
         public async Task JoinTable(string tableName)
