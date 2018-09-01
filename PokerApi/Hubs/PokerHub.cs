@@ -40,9 +40,9 @@ namespace PokerApi.Hubs
 
         public async Task CreateTable(string tableName)
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, tableName);
+            await Groups.AddToGroupAsync(Context.ConnectionId, Context.ConnectionId);
             _gameHandler.CreateTable(Context.ConnectionId, tableName);
-            await Clients.Caller.SendAsync("TableCreated", _gameHandler.GetTable(tableName));
+            await Clients.Caller.SendAsync("TableCreated", _gameHandler.GetTable(Context.ConnectionId));
         }
 
         public async Task GetTables()
@@ -50,11 +50,12 @@ namespace PokerApi.Hubs
             await Clients.Caller.SendAsync("ViewTables", _gameHandler.GetTables());
         }
 
-        public async Task JoinTable(string tableName)
+        public async Task JoinTable(string tableId)
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, tableName);
-            _gameHandler.AddPlayerToTable(Context.ConnectionId, tableName);
-            await Clients.Group(tableName).SendAsync("PlayerCount", _gameHandler.GetTable(tableName));
+            await Groups.AddToGroupAsync(Context.ConnectionId, tableId);
+            _gameHandler.AddPlayerToTable(Context.ConnectionId, tableId);
+            var table = _gameHandler.GetTable(tableId);
+            await Clients.Group(tableId).SendAsync("TableUpdated", table);
         }
     }
 }

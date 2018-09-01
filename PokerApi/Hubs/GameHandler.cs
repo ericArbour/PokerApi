@@ -28,9 +28,8 @@ namespace PokerApi.Models
 
         public void CreateTable(string tableConnectionId, string tableName)
         {
-            var newTable = new Table { TableId = tableConnectionId, Players = new List<Player> { } };
-            _tables.Add(tableName, newTable);
-
+            var newTable = new Table { TableId = tableConnectionId, Name = tableName, Players = new List<Player> { } };
+            _tables.Add(tableConnectionId, newTable);
         }
 
         public Dictionary<string, Table> GetTables()
@@ -38,9 +37,10 @@ namespace PokerApi.Models
             return _tables;
         }
 
-        public Table GetTable(string tableName)
+        public Table GetTable(string tableId)
         {
-            return _tables[tableName];
+            var tables = _tables;
+            return _tables[tableId];
         }
 
         public void AddPlayerToTable(string playerConnectionId, string tableName)

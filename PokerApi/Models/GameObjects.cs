@@ -8,6 +8,7 @@ namespace PokerApi.Models
     public class Table
     {
         public string TableId { get; set; }
+        public string Name { get; set; }
         public List<Player> Players { get; set; }
     }
 
