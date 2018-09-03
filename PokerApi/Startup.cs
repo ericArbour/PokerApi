@@ -39,7 +39,7 @@ namespace PokerApi
                     .AllowCredentials());
             });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.AddSingleton<IGameHandler, GameHandler>();
+            services.AddSingleton<ITableHandler, TableHandler>();
             services.AddSignalR();
         }
 
