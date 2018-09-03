@@ -12,14 +12,24 @@ namespace PokerApi.Models
         private List<string> _hand1 { get; set; }
         private List<string> _hand2 { get; set; }
         private int _currentHand { get; set; }
+        private Dictionary<string, string> _playerCards { get; set; }
+        public List<string> _sharedCards { get; set; }
+        public int _pot { get; set; }
+        public string _dealerPlayer { get; set; }
+        public string _currentPlayer { get; set; }
 
-        public Game(HandData handData, List<string> deck)
+        public Game(HandData handData, Deck deck)
         {
             _handData = handData;
-            _deck = deck;
+            _deck = deck.Shuffle();
             _hand1 = new List<string> { };
             _hand2 = new List<string> { };
             _currentHand = 1;
+        }
+
+        public PublicGameState GetPublicState()
+        {
+            return new PublicGameState() { SharedCards = _sharedCards, Pot = _pot, DealerPlayer = _dealerPlayer, CurrentPlayer = _currentPlayer };
         }
 
         public Showdown Play()
