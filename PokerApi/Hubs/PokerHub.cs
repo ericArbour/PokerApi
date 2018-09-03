@@ -34,12 +34,15 @@ namespace PokerApi.Hubs
             await Groups.AddToGroupAsync(Context.ConnectionId, tableId);
             _tableHandler.AddPlayerToTable(Context.ConnectionId, tableId);
             var table = _tableHandler.GetTable(tableId);
-            await Clients.Group(tableId).SendAsync("TableUpdated", table);
+            await Clients.Client(tableId).SendAsync("TableUpdated", table);
+            await Clients.Caller.SendAsync("JoinedTable", table.isPlaying);
         }
 
         public async Task StartGame()
         {
-            await Clients.Group(Context.ConnectionId).SendAsync("GameStarted", _tableHandler.StartGame(Context.ConnectionId));
+            var table = _tableHandler.StartGame(Context.ConnectionId);
+            await Clients.Caller.SendAsync("GameStarted", table);
+            await Clients.Others.SendAsync("GameStarted", table.isPlaying);
         }
     }
 }
