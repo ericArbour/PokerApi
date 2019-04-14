@@ -5,18 +5,18 @@ using System.Threading.Tasks;
 
 namespace PokerApi.Models
 {
-    public class HandData
+    public class HandCalculator
     {
         private CardValues _cardValues { get; set; }
         private HandValues _handValues { get; set; }
 
-        public HandData(CardValues cardValues, HandValues handValues)
+        public HandCalculator(CardValues cardValues, HandValues handValues)
         {
             _cardValues = cardValues;
             _handValues = handValues;
         }
 
-        public HandWithData Calculate(List<string> hand)
+        public HandResult Calculate(List<string> hand)
         {
             var orderedFaces = hand.Select(card => card.Substring(0, 1)).OrderByDescending(face => _cardValues.GetCardIndexes(face)).ToList();
             var uniqueFaces = orderedFaces.Distinct().ToList();
@@ -47,7 +47,7 @@ namespace PokerApi.Models
                 pairCount == 1 ? (_handValues.OnePairValue(faceCounts), "One Pair") :
                 (_handValues.HighCardHandValue(orderedFaces), "High Card");
 
-            return new HandWithData { Hand = hand, Value = valueAndType.Item1, Type = valueAndType.Item2 };
+            return new HandResult { Hand = hand, Value = valueAndType.Item1, Type = valueAndType.Item2 };
         }
 
         private bool CheckFlush(List<string> cards)
@@ -103,7 +103,7 @@ namespace PokerApi.Models
         }
     }
 
-    public class HandWithData
+    public class HandResult
     {
         public List<string> Hand;
         public int Value;

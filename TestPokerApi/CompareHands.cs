@@ -24,7 +24,7 @@ namespace TestPokerApi
         public void CompareHandsTest(List<string> hand1, List<string> hand2)
         {
             var cardValues = new CardValues();
-            var handData = new HandData(cardValues, new HandValues(cardValues));
+            var handData = new HandCalculator(cardValues, new HandValues(cardValues));
             var hand1WithData = handData.Calculate(hand1);
             var hand2WithData = handData.Calculate(hand2);
             Assert.True(hand1WithData.Value > hand2WithData.Value);

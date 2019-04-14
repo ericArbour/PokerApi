@@ -10,16 +10,16 @@ namespace PokerApi.Models
     public interface ITableHandler
     {
         void CreateTable(string tableId, string tableName);
-        Dictionary<string, Table> GetTables();
-        PublicTable GetTable(string tableId);
+        Dictionary<string, TableSummary> GetTables();
+        TableSummary GetTable(string tableId);
         void AddPlayerToTable(string playerConnectionId, string tableName);
-        PublicTable StartGame(string tableId);
+        Game StartGame(string tableId);
     }
 
     public class TableHandler : ITableHandler
     {
         private HashSet<string> _connectedIds = new HashSet<string> { };
-        private Dictionary<string, TotalTable> _tables = new Dictionary<string, TotalTable> { };
+        private Dictionary<string, Table> _tables = new Dictionary<string, Table> { };
         private readonly IHubContext<PokerHub> _hubContext;
 
         public TableHandler(IHubContext<PokerHub> hubContext)
@@ -29,24 +29,24 @@ namespace PokerApi.Models
 
         public void CreateTable(string tableId, string tableName)
         {
-            var newTable = new TotalTable { Id = tableId, Name = tableName, Players = new List<Player> { }, isPlaying = false };
+            var newTable = new Table { Id = tableId, Name = tableName, Players = new List<Player> { }, isPlaying = false };
             _tables.Add(tableId, newTable);
         }
 
-        public Dictionary<string, Table> GetTables()
+        public Dictionary<string, TableSummary> GetTables()
         {
-            var publicTables = new Dictionary<string, Table> { };
-            foreach(KeyValuePair<string, TotalTable> table in _tables)
+            var publicTables = new Dictionary<string, TableSummary> { };
+            foreach(KeyValuePair<string, Table> table in _tables)
             {
-                publicTables.Add(table.Key, new Table() { Id = table.Value.Id, Name = table.Value.Name, Players = table.Value.Players, isPlaying = table.Value.isPlaying });
+                publicTables.Add(table.Key, new TableSummary() { Id = table.Value.Id, Name = table.Value.Name, PlayerCount = table.Value.Players.Count(), isPlaying = table.Value.isPlaying });
             }
             return publicTables;
         }
 
-        public PublicTable GetTable(string tableId)
+        public TableSummary GetTable(string tableId)
         {
             var table = _tables[tableId];
-            return new PublicTable() { Id = table.Id, Name = table.Name, Players = table.Players, isPlaying = table.isPlaying };
+            return new TableSummary() { Id = table.Id, Name = table.Name, PlayerCount = table.Players.Count(), isPlaying = table.isPlaying };
         }
 
         public void AddPlayerToTable(string playerConnectionId, string tableId)
@@ -54,16 +54,16 @@ namespace PokerApi.Models
             _tables[tableId].Players.Add(new Player { Id = playerConnectionId });
         }
 
-        public PublicTable StartGame(string tableId)
+        public Game StartGame(string tableId)
         {
             var deck = new Deck();
             var cardValues = new CardValues();
-            var handData = new HandData(cardValues, new HandValues(cardValues));
-            var game = new Game(handData, deck);
+            var handCalculator = new HandCalculator(cardValues, new HandValues(cardValues));
             var table = _tables[tableId];
+            var game = new Game(handCalculator, deck, table.Players);
             table.Game = game;
             table.isPlaying = true;
-            return new PublicTable() { Id = table.Id, Name = table.Name, Players = table.Players, isPlaying = table.isPlaying, PublicGameState = table.Game.GetPublicState() };
+            return table.Game;
         }
     }
 }

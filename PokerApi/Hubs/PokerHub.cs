@@ -40,9 +40,12 @@ namespace PokerApi.Hubs
 
         public async Task StartGame()
         {
-            var table = _tableHandler.StartGame(Context.ConnectionId);
-            await Clients.Caller.SendAsync("GameStarted", table);
-            await Clients.Others.SendAsync("GameStarted", table.isPlaying);
+            var game = _tableHandler.StartGame(Context.ConnectionId);
+            await Clients.Caller.SendAsync("GameStarted", game.GetPublicGameState());
+            foreach(Player player in game.players)
+            {
+                await Clients.Client(player.Id).SendAsync("GameStarted", game.GetPlayerGameState(player.Id));
+            }
         }
     }
 }
