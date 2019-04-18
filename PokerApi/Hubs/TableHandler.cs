@@ -10,7 +10,7 @@ namespace PokerApi.Models
     public interface ITableHandler
     {
         void CreateTable(string tableId, string tableName);
-        Dictionary<string, TableSummary> GetTables();
+        List<TableSummary> GetTables();
         TableSummary GetTable(string tableId);
         void AddPlayerToTable(string playerConnectionId, string tableName);
         Game StartGame(string tableId);
@@ -33,14 +33,14 @@ namespace PokerApi.Models
             _tables.Add(tableId, newTable);
         }
 
-        public Dictionary<string, TableSummary> GetTables()
+        public List<TableSummary> GetTables()
         {
-            var publicTables = new Dictionary<string, TableSummary> { };
-            foreach(KeyValuePair<string, Table> table in _tables)
-            {
-                publicTables.Add(table.Key, new TableSummary() { Id = table.Value.Id, Name = table.Value.Name, PlayerCount = table.Value.Players.Count(), isPlaying = table.Value.isPlaying });
-            }
-            return publicTables;
+            return _tables.Select(table => new TableSummary() {
+                Id = table.Value.Id,
+                Name = table.Value.Name,
+                PlayerCount = table.Value.Players.Count(),
+                isPlaying = table.Value.isPlaying
+            }).ToList();
         }
 
         public TableSummary GetTable(string tableId)
