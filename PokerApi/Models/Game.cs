@@ -10,27 +10,27 @@ namespace PokerApi.Models
         private HandCalculator _handCalculator { get; set; }
         private List<string> _deck { get; set; }
         private Dictionary<string, List<string>> _playerHands { get; set; }
-        public List<Player> players { get; set; }
-        public string currentPlayer { get; set; }
-        public int pot { get; set; }
+        public List<Player> Players { get; set; }
+        public string CurrentPlayer { get; set; }
+        public int Pot { get; set; }
 
         public Game(HandCalculator handCalculator, Deck deck, List<Player> initialPlayers)
         {
             _handCalculator = handCalculator;
             _deck = deck.Shuffle();
-            players = initialPlayers;
-            _playerHands = players.ToDictionary(player => player.Id, player => new List<string> { });
-            currentPlayer = players[0].Id;
+            Players = initialPlayers;
+            _playerHands = Players.ToDictionary(player => player.Id, player => new List<string> { });
+            CurrentPlayer = Players[0].Id;
         }
 
         public PublicGameState GetPublicGameState()
         {
-            return new PublicGameState() { Pot = pot, Players = players, CurrentPlayer = currentPlayer };
+            return new PublicGameState() { Pot = Pot, Players = Players, CurrentPlayer = CurrentPlayer };
         }
 
         public PlayerGameState GetPlayerGameState(string playerId)
         {
-            return new PlayerGameState() { Pot = pot, Players = players, CurrentPlayer = currentPlayer, Hand = _playerHands[playerId] };
+            return new PlayerGameState() { Pot = Pot, Players = Players, CurrentPlayer = CurrentPlayer, Hand = _playerHands[playerId] };
         }
 
         //public Showdown Play()

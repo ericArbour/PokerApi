@@ -12,13 +12,17 @@ namespace PokerApi.Models
         public List<Player> Players { get; set; }
         public bool isPlaying { get; set; }
         public Game Game { get; set; }
+        public TableSummary GetTableSummary()
+        {
+            return new TableSummary { Id = Id, Name = Name, Players = Players, isPlaying = isPlaying };
+        }
     }
 
     public class TableSummary
     {
         public string Id { get; set; }
         public string Name { get; set; }
-        public int PlayerCount { get; set; }
+        public List<Player> Players { get; set; }
         public bool isPlaying { get; set; }
     }
 

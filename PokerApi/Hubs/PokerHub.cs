@@ -20,33 +20,43 @@ namespace PokerApi.Hubs
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, Context.ConnectionId);
             _tableHandler.CreateTable(Context.ConnectionId, tableName);
-            await Clients.Caller.SendAsync("TableCreated", _tableHandler.GetTable(Context.ConnectionId));
-            await Clients.All.SendAsync("PostTables", _tableHandler.GetTables());
+            await Clients.Caller.SendAsync("TableCreated", _tableHandler.GetTableSummary(Context.ConnectionId));
+            await Clients.All.SendAsync("PostTables", _tableHandler.GetTableSummaries());
         }
 
         public async Task GetTables()
         {
-            await Clients.Caller.SendAsync("PostTables", _tableHandler.GetTables());
+            await Clients.Caller.SendAsync("PostTables", _tableHandler.GetTableSummaries());
         }
 
         public async Task JoinTable(string tableId)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, tableId);
             _tableHandler.AddPlayerToTable(Context.ConnectionId, tableId);
-            var table = _tableHandler.GetTable(tableId);
-            await Clients.Client(tableId).SendAsync("TableUpdated", table);
-            await Clients.Caller.SendAsync("JoinedTable", table.isPlaying);
-            await Clients.All.SendAsync("PostTables", _tableHandler.GetTables());
+            var tableSummary = _tableHandler.GetTableSummary(tableId);
+            await Clients.Client(tableId).SendAsync("TableUpdated", tableSummary);
+            foreach (Player player in tableSummary.Players)
+            {
+                await Clients.Client(player.Id).SendAsync("TableUpdated", tableSummary);
+            }
+            await Clients.Caller.SendAsync("JoinedTable", tableSummary);
+            await Clients.All.SendAsync("PostTables", _tableHandler.GetTableSummaries());
         }
 
         public async Task StartGame()
         {
-            var game = _tableHandler.StartGame(Context.ConnectionId);
-            await Clients.Caller.SendAsync("GameStarted", game.GetPublicGameState());
-            foreach(Player player in game.players)
+            var tableSummary = _tableHandler.StartGame(Context.ConnectionId);
+            await Clients.Caller.SendAsync("TableUpdated", tableSummary);
+            foreach(Player player in tableSummary.Players)
             {
-                await Clients.Client(player.Id).SendAsync("GameStarted", game.GetPlayerGameState(player.Id));
+                await Clients.Client(player.Id).SendAsync("TableUpdated", tableSummary);
             }
+        }
+
+        public async Task GetPlayerGameState(string tableId)
+        {
+            var playerGameState = _tableHandler.GetPlayerGameState(tableId, Context.ConnectionId);
+            await Clients.Caller.SendAsync("PostPlayerGameState", playerGameState);
         }
     }
 }

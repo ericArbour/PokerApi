@@ -10,10 +10,11 @@ namespace PokerApi.Models
     public interface ITableHandler
     {
         void CreateTable(string tableId, string tableName);
-        List<TableSummary> GetTables();
-        TableSummary GetTable(string tableId);
+        List<TableSummary> GetTableSummaries();
+        TableSummary GetTableSummary(string tableId);
         void AddPlayerToTable(string playerConnectionId, string tableName);
-        Game StartGame(string tableId);
+        TableSummary StartGame(string tableId);
+        PlayerGameState GetPlayerGameState(string tableId, string playerId);
     }
 
     public class TableHandler : ITableHandler
@@ -33,20 +34,14 @@ namespace PokerApi.Models
             _tables.Add(tableId, newTable);
         }
 
-        public List<TableSummary> GetTables()
+        public List<TableSummary> GetTableSummaries()
         {
-            return _tables.Select(table => new TableSummary() {
-                Id = table.Value.Id,
-                Name = table.Value.Name,
-                PlayerCount = table.Value.Players.Count(),
-                isPlaying = table.Value.isPlaying
-            }).ToList();
+            return _tables.Select(table => table.Value.GetTableSummary()).ToList();
         }
 
-        public TableSummary GetTable(string tableId)
+        public TableSummary GetTableSummary(string tableId)
         {
-            var table = _tables[tableId];
-            return new TableSummary() { Id = table.Id, Name = table.Name, PlayerCount = table.Players.Count(), isPlaying = table.isPlaying };
+            return _tables[tableId].GetTableSummary();
         }
 
         public void AddPlayerToTable(string playerConnectionId, string tableId)
@@ -54,7 +49,7 @@ namespace PokerApi.Models
             _tables[tableId].Players.Add(new Player { Id = playerConnectionId });
         }
 
-        public Game StartGame(string tableId)
+        public TableSummary StartGame(string tableId)
         {
             var deck = new Deck();
             var cardValues = new CardValues();
@@ -63,7 +58,12 @@ namespace PokerApi.Models
             var game = new Game(handCalculator, deck, table.Players);
             table.Game = game;
             table.isPlaying = true;
-            return table.Game;
+            return table.GetTableSummary();
+        }
+
+        public PlayerGameState GetPlayerGameState(string tableId, string playerId)
+        {
+            return _tables[tableId].Game.GetPlayerGameState(playerId);
         }
     }
 }
