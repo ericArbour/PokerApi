@@ -15,6 +15,7 @@ namespace PokerApi.Models
         void AddPlayerToTable(string playerConnectionId, string tableName);
         TableSummary StartGame(string tableId);
         PlayerGameState GetPlayerGameState(string tableId, string playerId);
+        PublicGameState GetPublicGameState(string tableId);
     }
 
     public class TableHandler : ITableHandler
@@ -64,6 +65,11 @@ namespace PokerApi.Models
         public PlayerGameState GetPlayerGameState(string tableId, string playerId)
         {
             return _tables[tableId].Game.GetPlayerGameState(playerId);
+        }
+
+        public PublicGameState GetPublicGameState(string tableId)
+        {
+            return _tables[tableId].Game.GetPublicGameState();
         }
     }
 }

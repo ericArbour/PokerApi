@@ -58,5 +58,11 @@ namespace PokerApi.Hubs
             var playerGameState = _tableHandler.GetPlayerGameState(tableId, Context.ConnectionId);
             await Clients.Caller.SendAsync("PostPlayerGameState", playerGameState);
         }
+
+        public async Task GetPublicGameState()
+        {
+            var publicGameState = _tableHandler.GetPublicGameState(Context.ConnectionId);
+            await Clients.Caller.SendAsync("PostPublicGameState", publicGameState);
+        }
     }
 }
