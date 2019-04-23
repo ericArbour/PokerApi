@@ -9,8 +9,8 @@ namespace PokerApi.Models
     {
         private HandCalculator _handCalculator { get; set; }
         private List<string> _deck { get; set; }
-        private Dictionary<string, List<string>> _playerHands { get; set; }
         public List<Player> Players { get; set; }
+        private Dictionary<string, List<string>> _playerHands = new Dictionary<string, List<string>> { };
         public string CurrentPlayer { get; set; }
         public int Pot { get; set; }
 
@@ -21,6 +21,39 @@ namespace PokerApi.Models
             Players = initialPlayers;
             _playerHands = Players.ToDictionary(player => player.Id, player => new List<string> { });
             CurrentPlayer = Players[0].Id;
+            Pot = 0;
+            Deal();
+        }
+
+        public void Deal()
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                foreach (Player player in Players)
+                {
+                    if (!_playerHands.ContainsKey(player.Id))
+                    {
+                        _playerHands.Add(player.Id, new List<string> {});
+                    } 
+                    var rnd = new Random().Next(_deck.Count());
+                    var drawnCard = _deck[rnd];
+                    _playerHands[player.Id].Add(drawnCard);
+                    _deck.Remove(drawnCard);
+                }
+            }
+        }
+
+        public void PlayerAction(string playerId, string actionType, int betAmount)
+        {
+            if (actionType == "bet")
+            {
+                Player currentPlayer = Players.Find(player => player.Id == playerId);
+                if (currentPlayer.ChipCount >= betAmount)
+                {
+                    currentPlayer.ChipCount -= betAmount;
+                    Pot += betAmount;
+                }
+            }
         }
 
         public PublicGameState GetPublicGameState()

@@ -14,6 +14,7 @@ namespace PokerApi.Models
         TableSummary GetTableSummary(string tableId);
         void AddPlayerToTable(string playerConnectionId, string tableName);
         TableSummary StartGame(string tableId);
+        (TableSummary, PublicGameState, Dictionary<string, PlayerGameState>) PlayerAction(string tableId, string playerId, string actionType, int betAmoun);
         PlayerGameState GetPlayerGameState(string tableId, string playerId);
         PublicGameState GetPublicGameState(string tableId);
     }
@@ -47,7 +48,7 @@ namespace PokerApi.Models
 
         public void AddPlayerToTable(string playerConnectionId, string tableId)
         {
-            _tables[tableId].Players.Add(new Player { Id = playerConnectionId });
+            _tables[tableId].Players.Add(new Player { Id = playerConnectionId, ChipCount = 100 });
         }
 
         public TableSummary StartGame(string tableId)
@@ -60,6 +61,14 @@ namespace PokerApi.Models
             table.Game = game;
             table.isPlaying = true;
             return table.GetTableSummary();
+        }
+
+        public (TableSummary, PublicGameState, Dictionary<string, PlayerGameState>) PlayerAction(string tableId, string playerId, string actionType, int betAmount)
+        {
+            Table table = _tables[tableId];
+            table.Game.PlayerAction(playerId, actionType, betAmount);
+            var playerGameStates = table.Game.Players.ToDictionary(player => player.Id, player => table.Game.GetPlayerGameState(player.Id));
+            return (table.GetTableSummary(), table.Game.GetPublicGameState(), playerGameStates);
         }
 
         public PlayerGameState GetPlayerGameState(string tableId, string playerId)

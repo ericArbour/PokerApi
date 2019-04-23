@@ -30,6 +30,5 @@ namespace PokerApi.Models
     {
         public string Id { get; set; }
         public int ChipCount { get; set; }
-
     }
 }

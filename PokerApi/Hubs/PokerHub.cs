@@ -34,12 +34,12 @@ namespace PokerApi.Hubs
             await Groups.AddToGroupAsync(Context.ConnectionId, tableId);
             _tableHandler.AddPlayerToTable(Context.ConnectionId, tableId);
             var tableSummary = _tableHandler.GetTableSummary(tableId);
+            await Clients.Caller.SendAsync("JoinedTable", tableSummary, Context.ConnectionId);
             await Clients.Client(tableId).SendAsync("TableUpdated", tableSummary);
             foreach (Player player in tableSummary.Players)
             {
                 await Clients.Client(player.Id).SendAsync("TableUpdated", tableSummary);
             }
-            await Clients.Caller.SendAsync("JoinedTable", tableSummary);
             await Clients.All.SendAsync("PostTables", _tableHandler.GetTableSummaries());
         }
 
@@ -63,6 +63,16 @@ namespace PokerApi.Hubs
         {
             var publicGameState = _tableHandler.GetPublicGameState(Context.ConnectionId);
             await Clients.Caller.SendAsync("PostPublicGameState", publicGameState);
+        }
+
+        public async Task PlayerAction(string tableId, string actionType, int betAmount)
+        {
+            (TableSummary tableSummary, PublicGameState publicGameState, Dictionary<string, PlayerGameState> playerGameStates) = _tableHandler.PlayerAction(tableId, Context.ConnectionId, actionType, betAmount);
+            await Clients.Client(tableId).SendAsync("PostPublicGameState", publicGameState);
+            foreach (Player player in tableSummary.Players)
+            {
+                await Clients.Client(player.Id).SendAsync("PostPlayerGameState", playerGameStates[player.Id]);
+            }
         }
     }
 }
